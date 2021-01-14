@@ -1,6 +1,6 @@
 company = Company.create(
-  name: "Test Company",
-  subdomain: "test_company",
+  name: 'Test Company',
+  subdomain: 'test_company',
   api_token: 1
 )
 

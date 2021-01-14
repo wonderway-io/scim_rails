@@ -9,3 +9,5 @@ spec/dummy/tmp/
 
 */vendor/bundle/*
 *emfile.lock
+
+.byebug_history

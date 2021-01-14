@@ -1,6 +1,6 @@
 ScimRails.configure do |config|
   # Model used for authenticating and scoping users.
-  config.basic_auth_model = "Company"
+  config.basic_auth_model = 'Company'
 
   # Attribute used to search for a given record. This
   # attribute should be unique as it will return the
@@ -12,20 +12,17 @@ ScimRails.configure do |config|
   config.basic_auth_model_authenticatable_attribute = :api_token
 
   # Model used for user records.
-  config.scim_users_model = "User"
+  config.scim_users_model = 'User'
 
   # Method used for retrieving user records from the
   # authenticatable model.
   config.scim_users_scope = :users
 
-  # Determine whether the create endpoint updates users that already exist
-  # or throws an error (returning 409 Conflict in accordance with SCIM spec)
-  config.scim_user_prevent_update_on_create = false
-
   # Cryptographic algorithm used for signing the auth tokens.
   # It supports all algorithms supported by the jwt gem.
-  # See https://github.com/jwt/ruby-jwt#algorithms-and-usage for supported algorithms
-  # It is "none" by default, hence generated tokens are unsigned
+  # See https://github.com/jwt/ruby-jwt#algorithms-and-usage for supported
+  # algorithms.
+  # It is "none" by default, hence generated tokens are unsigned.
   # The tokens do not need to be signed if you only need basic authentication.
   # config.signing_algorithm = "HS256"
 
@@ -60,11 +57,7 @@ ScimRails.configure do |config|
   # Array of attributes that can be modified on the
   # user model. If the attribute is not in this array
   # the attribute cannot be modified by this Gem.
-  config.mutable_user_attributes = [
-    :first_name,
-    :last_name,
-    :email
-  ]
+  config.mutable_user_attributes = [:first_name, :last_name, :email]
 
   # Hash of mutable attributes. This object is the map
   # for this Gem to figure out where to look in a SCIM
@@ -91,7 +84,7 @@ ScimRails.configure do |config|
   # through as is, symbols will be passed to the user
   # object to return a value.
   config.user_schema = {
-    schemas: ["urn:ietf:params:scim:schemas:core:2.0:User"],
+    schemas: ['urn:ietf:params:scim:schemas:core:2.0:User'],
     id: :id,
     userName: :email,
     name: {
@@ -101,7 +94,7 @@ ScimRails.configure do |config|
     emails: [
       {
         value: :email
-      },
+      }
     ],
     active: :active?
   }

@@ -22,7 +22,7 @@ class User < ApplicationRecord
   end
 
   def archive!
-    write_attribute(:archived_at, Time.now)
+    write_attribute(:archived_at, Time.zone.now)
     save!
   end
 

@@ -1,2 +1,174 @@
-inherit_from:
-  - https://raw.githubusercontent.com/lessonly/rubocop-default-configuration/master/.rubocop.yml
+  # Check out all configs on https://docs.rubocop.org/en/latest/
+
+require: rubocop-rails
+
+AllCops:
+  TargetRubyVersion: 2.6
+  Exclude:
+    - 'db/**/*'
+    - 'vendor/bundle/**/*'
+    - 'config/**/*'
+    - 'script/**/*'
+    - 'bin/{rails,rake}'
+  NewCops: enable
+
+Rails:
+  Enabled: true
+
+# New Cops that we are breaking. Assess!
+Layout/SpaceAroundMethodCallOperator:
+  Enabled: false
+Lint/ConstantDefinitionInBlock:
+  Enabled: false
+Rails/ActiveRecordCallbacksOrder:
+  Enabled: false
+Rails/NegateInclude:
+  Enabled: false
+Rails/SquishedSQLHeredocs:
+  Enabled: false
+Style/CaseLikeIf:
+  Enabled: false
+Style/ExplicitBlockArgument:
+  Enabled: false
+Style/HashAsLastArrayItem:
+  Enabled: false
+Style/HashEachMethods:
+  Enabled: false
+Style/HashLikeCase:
+  Enabled: false
+Style/HashTransformValues:
+  Enabled: false
+Style/NumericLiterals:
+  Exclude:
+    - spec/dummy/db/schema.rb
+Style/RedundantAssignment:
+  Enabled: false
+Style/RedundantRegexpEscape:
+  Enabled: false
+Style/SlicingWithRange:
+  Enabled: false
+Style/SoleNestedConditional:
+  Enabled: false
+Style/StringLiterals:
+  Exclude:
+    - spec/dummy/db/schema.rb
+Style/StringConcatenation:
+  Enabled: false
+# end of NewCops that we are breaking
+
+Layout/AccessModifierIndentation:
+  EnforcedStyle: outdent
+
+Layout/ArgumentAlignment:
+  EnforcedStyle: with_fixed_indentation
+
+Layout/ParameterAlignment:
+  EnforcedStyle: with_fixed_indentation
+
+Layout/BeginEndAlignment:
+  EnforcedStyleAlignWith: start_of_line
+
+Layout/BlockAlignment:
+  EnforcedStyleAlignWith: start_of_block
+
+Layout/EmptyLineAfterGuardClause:
+  Enabled: false
+
+Layout/EmptyLinesAroundBlockBody:
+  Exclude:
+    - spec/dummy/db/schema.rb
+
+Layout/MultilineArrayBraceLayout:
+  EnforcedStyle: new_line
+
+Layout/MultilineHashBraceLayout:
+  EnforcedStyle: new_line
+
+Layout/MultilineMethodCallBraceLayout:
+  EnforcedStyle: new_line
+
+Layout/MultilineMethodCallIndentation:
+  EnforcedStyle: indented
+
+Layout/MultilineMethodDefinitionBraceLayout:
+  EnforcedStyle: new_line
+
+Layout/LineLength:
+  Max: 80
+  IgnoredPatterns: ['\A#']
+
+Style/RegexpLiteral:
+  EnforcedStyle: slashes
+  AllowInnerSlashes: trueines
+
+Style/MultilineBlockChain:
+  Enabled: false
+
+Style/ClassAndModuleChildren:
+  Enabled: false
+
+Style/SymbolArray:
+  EnforcedStyle: brackets
+
+Style/Documentation:
+  Enabled: false
+
+Style/FrozenStringLiteralComment:
+  EnforcedStyle: never
+
+Style/ParenthesesAroundCondition:
+  AllowInMultilineConditions: true
+
+Style/MixinUsage:
+  Exclude:
+    - app/bin/**/*
+    - spec/dummy/bin/**/*
+
+Style/ModuleFunction:
+  Enabled: false
+
+Metrics/CyclomaticComplexity:
+  Enabled: false
+
+Metrics/PerceivedComplexity:
+  Enabled: false
+
+Metrics/AbcSize:
+  Enabled: false
+
+Metrics/MethodLength:
+  Enabled: false
+
+Metrics/ClassLength:
+  Enabled: false
+
+Metrics/ModuleLength:
+  Max: 150
+  CountAsOne:
+    - array
+    - hash
+  Exclude:
+    - app/services/tracker/**/*
+    - spec/support/**/*
+
+Metrics/BlockLength:
+  Exclude:
+    - spec/**/*
+    - lib/tasks/**/*
+    - lib/generators/**/templates/**/*
+    - app/admin/**/*
+    - app/controllers/concerns/**/*
+
+Naming/RescuedExceptionsVariableName:
+  PreferredName: "error"
+
+Rails/HasAndBelongsToMany:
+  Enabled: false
+
+Rails/HttpPositionalArguments:
+  Enabled: false
+
+Rails/SkipsModelValidations:
+  AllowedMethods: ['touch']
+  Exclude:
+    - 'spec/**/*'

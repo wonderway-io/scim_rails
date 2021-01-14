@@ -10,5 +10,6 @@ gemspec
 # Git. Remember to move these dependencies to your gemspec before releasing
 # your gem to rubygems.org.
 
-gem "rails", "~> 6.0"
+gem 'byebug'
 gem 'pry', group: [:development, :test]
+gem 'rails', '~> 6.0'

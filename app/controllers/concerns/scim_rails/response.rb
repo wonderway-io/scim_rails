@@ -1,6 +1,6 @@
 module ScimRails
   module Response
-    CONTENT_TYPE = "application/scim+json".freeze
+    CONTENT_TYPE = 'application/scim+json'.freeze
 
     def json_response(object, status = :ok)
       render \
@@ -11,12 +11,12 @@ module ScimRails
 
     def json_scim_response(object:, status: :ok, counts: nil)
       case params[:action]
-      when "index"
+      when 'index'
         render \
           json: list_response(object, counts),
           status: status,
           content_type: CONTENT_TYPE
-      when "show", "create", "put_update", "patch_update"
+      when 'show', 'create', 'put', 'patch'
         render \
           json: user_response(object),
           status: status,
@@ -24,7 +24,7 @@ module ScimRails
       end
     end
 
-    private
+  private
 
     def list_response(object, counts)
       object = object
@@ -33,7 +33,7 @@ module ScimRails
         .limit(counts.limit)
       {
         "schemas": [
-            "urn:ietf:params:scim:api:messages:2.0:ListResponse"
+          'urn:ietf:params:scim:api:messages:2.0:ListResponse'
         ],
         "totalResults": counts.total,
         "startIndex": counts.start_index,
@@ -52,7 +52,6 @@ module ScimRails
       schema = ScimRails.config.user_schema
       find_value(user, schema)
     end
-
 
     # `find_value` is a recursive method that takes a "user" and a
     # "user schema" and replaces any symbols in the schema with the
