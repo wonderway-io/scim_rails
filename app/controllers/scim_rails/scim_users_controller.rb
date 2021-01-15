@@ -1,21 +1,14 @@
 module ScimRails
   class ScimUsersController < ScimRails::ApplicationController
-    def index
-      if params[:filter].present?
-        query = ScimRails::ScimQueryParser.new(params[:filter])
+    before_action :load_user, except: [:index, :create]
+    after_action :update_status, except: [:index]
+    # TODO
+    # [Later] Add meta fields to response
+    # [Later] Add meta endpoints
 
-        users = @company
-          .public_send(ScimRails.config.scim_users_scope)
-          .where(
-            "#{ScimRails.config.scim_users_model.connection.quote_column_name(query.attribute)} #{query.operator} ?",
-            query.parameter
-          )
-          .order(ScimRails.config.scim_users_list_order)
-      else
-        users = @company
-          .public_send(ScimRails.config.scim_users_scope)
-          .order(ScimRails.config.scim_users_list_order)
-      end
+    def index
+      users = company_users.order(ScimRails.config.scim_users_list_order)
+      users = apply_filters(users)
 
       counts = ScimCount.new(
         start_index: params[:startIndex],
@@ -27,122 +20,139 @@ module ScimRails
     end
 
     def create
-      if ScimRails.config.scim_user_prevent_update_on_create
-        user = @company.public_send(ScimRails.config.scim_users_scope).create!(permitted_user_params)
-      else
-        username_key = ScimRails.config.queryable_user_attributes[:userName]
-        find_by_username = Hash.new
-        find_by_username[username_key] = permitted_user_params[username_key]
-        user = @company
-          .public_send(ScimRails.config.scim_users_scope)
-          .find_or_create_by(find_by_username)
-        user.update!(permitted_user_params)
+      # If user exists => fail
+      username_key = ScimRails.config.queryable_user_attributes[:userName]
+      username_value = permitted_user_params[username_key]
+      raise ScimRails::ExceptionHandler::Uniqueness \
+        if company_users.exists?(username_key => username_value)
+
+      # Try to retrieve existing user that might have been archived
+      if ScimRails.config.on_retrieve_user.respond_to?(:call)
+        @user = ScimRails.config.on_retrieve_user.call(
+          @company,
+          permitted_user_params
+        )
       end
-      update_status(user) unless put_active_param.nil?
-      json_scim_response(object: user, status: :created)
+
+      # If user can be recovered => recover
+      if @user.present?
+        @user.public_send(ScimRails.config.user_reprovision_method)
+        @user.update! permitted_user_params
+      # Create user
+      else
+        @user = company_users.create!(permitted_user_params)
+      end
+
+      json_scim_response(object: @user, status: :created)
     end
 
     def show
-      user = @company.public_send(ScimRails.config.scim_users_scope).find(params[:id])
-      json_scim_response(object: user)
+      json_scim_response(object: @user)
     end
 
-    def put_update
-      user = @company.public_send(ScimRails.config.scim_users_scope).find(params[:id])
-      update_status(user) unless put_active_param.nil?
-      user.update!(permitted_user_params)
-      json_scim_response(object: user)
+    def put
+      @user.update!(permitted_user_params)
+      json_scim_response(object: @user)
     end
 
-    # TODO: PATCH will only deprovision or reprovision users.
-    # This will work just fine for Okta but is not SCIM compliant.
-    def patch_update
-      user = @company.public_send(ScimRails.config.scim_users_scope).find(params[:id])
-      update_status(user)
-      json_scim_response(object: user)
-    end
+    def patch
+      @user.transaction do
+        (params['Operations'] || []).each do |operation|
+          # add / replace / remove
+          op = operation['op']
+          # e.g. name.familyName or addresses[type eq \"work\"]
+          path = operation['path']
+          attribute = ScimRails::ScimPathParser.attribute_for(path)
+          # e.g. my@user.com
+          value = operation['value']
+          raise ScimRails::ExceptionHandler::UnsupportedPatchRequest \
+            if value.nil?
 
-    private
-
-    def permitted_user_params
-      ScimRails.config.mutable_user_attributes.each.with_object({}) do |attribute, hash|
-        hash[attribute] = find_value_for(attribute)
-      end
-    end
-
-    def find_value_for(attribute)
-      params.dig(*path_for(attribute))
-    end
-
-    # `path_for` is a recursive method used to find the "path" for
-    # `.dig` to take when looking for a given attribute in the
-    # params.
-    #
-    # Example: `path_for(:name)` should return an array that looks
-    # like [:names, 0, :givenName]. `.dig` can then use that path
-    # against the params to translate the :name attribute to "John".
-
-    def path_for(attribute, object = ScimRails.config.mutable_user_attributes_schema, path = [])
-      at_path = path.empty? ? object : object.dig(*path)
-      return path if at_path == attribute
-
-      case at_path
-      when Hash
-        at_path.each do |key, value|
-          found_path = path_for(attribute, object, [*path, key])
-          return found_path if found_path
+          case op.downcase.to_sym
+          when :add, :replace
+            if path.nil?
+              params = permitted_user_params(value).reject do |_, new_value|
+                new_value.nil?
+              end
+              @user.update! params
+            elsif attribute.present?
+              @user.update! attribute => value
+            end
+          when :remove
+            raise ScimRails::ExceptionHandler::NoTarget if path.nil?
+            next if attribute.nil?
+            @user.update! attribute => nil
+          end
         end
-        nil
-      when Array
-        at_path.each_with_index do |value, index|
-          found_path = path_for(attribute, object, [*path, index])
-          return found_path if found_path
-        end
-        nil
       end
+
+      json_scim_response(object: @user)
     end
 
-    def update_status(user)
-      user.public_send(ScimRails.config.user_reprovision_method) if active?
-      user.public_send(ScimRails.config.user_deprovision_method) unless active?
+    def delete
+      @user.public_send(ScimRails.config.user_deprovision_method)
+      head :no_content
+    end
+
+  private
+
+    def load_user
+      @user = company_users.find_by!(
+        ScimRails.config.scim_users_id_field => params[:id]
+      )
+    end
+
+    def company_users
+      @company.public_send(ScimRails.config.scim_users_scope)
+    end
+
+    def apply_filters(users)
+      return users if params[:filter].blank?
+
+      query = ScimRails::ScimQueryParser.new(params[:filter])
+
+      column_name = ScimRails.config.scim_users_model.connection
+        .quote_column_name(query.attribute)
+      users.where(
+        "#{column_name} #{query.operator} ?",
+        query.parameter
+      )
+    end
+
+    def permitted_user_params(user_params = params)
+      ScimRails.config
+        .mutable_user_attributes
+        .each.with_object({}) do |attribute, hash|
+          hash[attribute] = user_params.dig(
+            *ScimRails::ScimPathParser.path_for(attribute)
+          )
+        end
+    end
+
+    def update_status
+      return if active?.nil?
+      @user.public_send(ScimRails.config.user_reprovision_method) if active?
+      @user.public_send(ScimRails.config.user_deprovision_method) unless active?
     end
 
     def active?
-      active = put_active_param
-      active = patch_active_param if active.nil?
+      to_bool = ->(value) { [1, true, 'TRUE', 'True', 'true'].include?(value) }
 
-      case active
-      when true, "true", 1
-        true
-      when false, "false", 0
-        false
-      else
-        raise ActiveRecord::RecordInvalid
+      if params['Operations'].present?
+        params['Operations'].each do |operation|
+          if (
+            operation['path'].nil? &&
+            operation['value'].try { |value| value.include?('active') }
+          )
+            return to_bool.call(operation['value']['active'])
+          end
+
+          return to_bool.call(operation['value']) \
+            if operation['path'] == 'active'
+        end
+      elsif params.include? :active
+        to_bool.call(params[:active])
       end
-    end
-
-    def put_active_param
-      params[:active]
-    end
-
-    def patch_active_param
-      handle_invalid = lambda do
-        raise ScimRails::ExceptionHandler::UnsupportedPatchRequest
-      end
-
-      operations = params["Operations"] || {}
-
-      valid_operation = operations.find(handle_invalid) do |operation|
-        valid_patch_operation?(operation)
-      end
-
-      valid_operation.dig("value", "active")
-    end
-
-    def valid_patch_operation?(operation)
-      operation["op"].casecmp("replace") &&
-        operation["value"] &&
-        [true, false].include?(operation["value"]["active"])
     end
   end
 end
