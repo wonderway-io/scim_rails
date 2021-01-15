@@ -2,9 +2,6 @@ module ScimRails
   class ScimUsersController < ScimRails::ApplicationController
     before_action :load_user, except: [:index, :create]
     after_action :update_status, except: [:index]
-    # TODO
-    # [Later] Add meta fields to response
-    # [Later] Add meta endpoints
 
     def index
       users = company_users.order(ScimRails.config.scim_users_list_order)

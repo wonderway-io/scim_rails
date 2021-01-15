@@ -26,6 +26,8 @@ module ScimRails
       :on_retrieve_user,
       :queryable_user_attributes,
       :scim_users_id_field,
+      :scim_users_created_at_field,
+      :scim_users_updated_at_field,
       :scim_users_list_order,
       :scim_users_scope,
       :signing_secret,
@@ -39,6 +41,8 @@ module ScimRails
       @basic_auth_model = 'Company'
       @scim_users_id_field = :id
       @scim_users_list_order = :id
+      @scim_users_created_at_field = :created_at
+      @scim_users_updated_at_field = :updated_at
       @scim_users_model = 'User'
       @signing_algorithm = ALGO_NONE
       @user_schema = {}

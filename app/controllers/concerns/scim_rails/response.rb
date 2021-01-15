@@ -50,7 +50,7 @@ module ScimRails
 
     def user_response(user)
       schema = ScimRails.config.user_schema
-      find_value(user, schema)
+      find_value(user, schema).merge(meta_fields(user))
     end
 
     # `find_value` is a recursive method that takes a "user" and a
@@ -59,7 +59,6 @@ module ScimRails
     # `find_value` will search through the object for the symbols,
     # send those symbols to the model, and replace the symbol with
     # the return value.
-
     def find_value(user, object)
       case object
       when Hash
@@ -75,6 +74,24 @@ module ScimRails
       else
         object
       end
+    end
+
+    def meta_fields(user)
+      config = ScimRails.config
+      created_at = user.public_send(config.scim_users_created_at_field)
+        if config.scim_users_created_at_field
+      updated_at = user.public_send(config.scim_users_updated_at_field)
+        if config.scim_users_updated_at_field
+      id = user.public_send(config.scim_users_id_field)
+
+      {
+        meta: {
+          resourceType: 'User',
+          created: created_at,
+          lastModified: updated_at,
+          location: "#{scim_v2_Users_path}/#{id}"
+        }
+      }
     end
   end
 end
