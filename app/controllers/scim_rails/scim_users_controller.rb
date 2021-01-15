@@ -68,9 +68,7 @@ module ScimRails
           case op.downcase.to_sym
           when :add, :replace
             if path.nil?
-              params = permitted_user_params(value).reject do |_, new_value|
-                new_value.nil?
-              end
+              params = permitted_user_params(value).compact
               @user.update! params
             elsif attribute.present?
               @user.update! attribute => value

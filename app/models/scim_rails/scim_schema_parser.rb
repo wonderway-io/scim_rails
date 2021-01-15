@@ -145,10 +145,10 @@ module ScimRails::ScimSchemaParser
       returned: returned_schema.dig(*path, key) ? :always : :never,
       # "none", "server", "global"
       uniqueness:
-        if type != :complex
-          unique?(column) ? :server : :none
-        else
+        if type == :complex
           :none
+        else
+          unique?(column) ? :server : :none
         end
 
       # not needed / implemented
