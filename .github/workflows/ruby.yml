@@ -28,6 +28,12 @@ jobs:
       with:
         ruby-version: ${{ matrix.ruby-version }}
         bundler-cache: true # runs 'bundle install' and caches installed gems automatically
+        
+        
+    - name: Setup database
+      run: bundle exec rails db:migrate
+      env:
+        RAILS_ENV: test
 
     - name: Run rubocop
       run: bundle exec rubocop
