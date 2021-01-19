@@ -78,9 +78,9 @@ module ScimRails
 
     def meta_fields(user)
       config = ScimRails.config
-      created_at = user.public_send(config.scim_users_created_at_field)
+      created_at = user.public_send(config.scim_users_created_at_field) \
         if config.scim_users_created_at_field
-      updated_at = user.public_send(config.scim_users_updated_at_field)
+      updated_at = user.public_send(config.scim_users_updated_at_field) \
         if config.scim_users_updated_at_field
       id = user.public_send(config.scim_users_id_field)
 
