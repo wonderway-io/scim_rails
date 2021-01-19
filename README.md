@@ -1,6 +1,4 @@
-[![Build Status](https://travis-ci.com/lessonly/scim_rails.svg?branch=master)](https://travis-ci.com/lessonly/scim_rails)
-[![Inline docs](http://inch-ci.org/github/lessonly/scim_rails.svg?branch=master)](http://inch-ci.org/github/lessonly/scim_rails)
-[![Maintainability](https://api.codeclimate.com/v1/badges/ddfb6a891d2f0d1122ae/maintainability)](https://codeclimate.com/github/lessonly/scim_rails/maintainability)
+![Ruby](https://github.com/Wonderwerk/scim_rails/workflows/Ruby/badge.svg)
 
 # ScimRails
 
