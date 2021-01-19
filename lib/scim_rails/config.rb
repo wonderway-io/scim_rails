@@ -25,7 +25,6 @@ module ScimRails
       :on_error,
       :on_retrieve_user,
       :queryable_user_attributes,
-      :scim_users_id_field,
       :scim_users_created_at_field,
       :scim_users_updated_at_field,
       :scim_users_list_order,
@@ -39,7 +38,6 @@ module ScimRails
 
     def initialize
       @basic_auth_model = 'Company'
-      @scim_users_id_field = :id
       @scim_users_list_order = :id
       @scim_users_created_at_field = :created_at
       @scim_users_updated_at_field = :updated_at
@@ -47,6 +45,10 @@ module ScimRails
       @signing_algorithm = ALGO_NONE
       @user_schema = {}
       @user_attributes = []
+    end
+
+    def scim_users_id_field
+      user_schema[:id] || :id
     end
 
     def mutable_user_attributes_schema
