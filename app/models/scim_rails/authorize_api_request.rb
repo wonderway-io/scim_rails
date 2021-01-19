@@ -39,6 +39,11 @@ module ScimRails
         authentication_attribute
       )
       raise ScimRails::ExceptionHandler::InvalidCredentials unless authorized
+
+      on_validate_auth_model = ScimRails.config.on_validate_auth_model
+      return unless on_validate_auth_model.respond_to? :call
+      valid = on_validate_auth_model.call(authentication_model)
+      raise ScimRails::ExceptionHandler::InvalidCredentials unless valid
     end
   end
 end

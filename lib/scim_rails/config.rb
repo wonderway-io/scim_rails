@@ -24,6 +24,7 @@ module ScimRails
       :mutable_user_attributes,
       :on_error,
       :on_retrieve_user,
+      :on_validate_auth_model,
       :queryable_user_attributes,
       :scim_users_created_at_field,
       :scim_users_updated_at_field,
