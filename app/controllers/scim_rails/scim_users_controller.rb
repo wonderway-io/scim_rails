@@ -40,6 +40,9 @@ module ScimRails
         @user = company_users.create!(permitted_user_params)
       end
 
+      ScimRails.config.on_created_user.call(@user) \
+        if ScimRails.config.on_created_user.respond_to?(:call)
+
       json_scim_response(object: @user, status: :created)
     end
 
@@ -86,6 +89,10 @@ module ScimRails
 
     def delete
       @user.public_send(ScimRails.config.user_deprovision_method)
+
+      ScimRails.config.on_deleted_user.call(@user) \
+        if ScimRails.config.on_deleted_user.respond_to?(:call)
+
       head :no_content
     end
 

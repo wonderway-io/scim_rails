@@ -22,6 +22,8 @@ module ScimRails
       :basic_auth_model_authenticatable_attribute,
       :basic_auth_model_searchable_attribute,
       :mutable_user_attributes,
+      :on_created_user,
+      :on_deleted_user,
       :on_error,
       :on_retrieve_user,
       :on_validate_auth_model,
