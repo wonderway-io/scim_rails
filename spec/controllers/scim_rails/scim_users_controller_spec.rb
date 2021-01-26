@@ -115,6 +115,40 @@ RSpec.describe ScimRails::ScimUsersController, type: :controller do
         expect(response_body['Resources'].count).to eq 1
       end
 
+      it 'applies filters on attributes if specified' do
+        allow(ScimRails.config).to(
+          receive(:user_attribute_filters)
+          .and_return({ email: :downcase })
+        )
+
+        create(:user, email: 'test1@example.com', company: company)
+        create(:user, email: 'test2@example.com', company: company)
+
+        get :index, params: {
+          filter: 'email eq TeSt1@example.com'
+        }, as: :json
+        response_body = JSON.parse(response.body)
+        expect(response_body['totalResults']).to eq 1
+        expect(response_body['Resources'].count).to eq 1
+      end
+
+      it 'applies filters on attributes if specified (callback)' do
+        allow(ScimRails.config).to(
+          receive(:user_attribute_filters)
+          .and_return({ email: ->(email) { email.downcase } })
+        )
+
+        create(:user, email: 'test1@example.com', company: company)
+        create(:user, email: 'test2@example.com', company: company)
+
+        get :index, params: {
+          filter: 'email eq TeSt1@example.com'
+        }, as: :json
+        response_body = JSON.parse(response.body)
+        expect(response_body['totalResults']).to eq 1
+        expect(response_body['Resources'].count).to eq 1
+      end
+
       it 'filters results by provided name filter' do
         create(:user, first_name: 'Chidi', last_name: 'Anagonye',
                       company: company

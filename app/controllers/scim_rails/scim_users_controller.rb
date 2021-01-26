@@ -108,6 +108,17 @@ module ScimRails
       @company.public_send(ScimRails.config.scim_users_scope)
     end
 
+    def filter_attribute(column, attribute)
+      filter = ScimRails.config.user_attribute_filters.try(:[], column)
+      return attribute if filter.blank?
+
+      if filter.respond_to?(:call)
+        filter.call(attribute)
+      else
+        attribute.send(filter)
+      end
+    end
+
     def apply_filters(users)
       return users if params[:filter].blank?
 
@@ -117,7 +128,7 @@ module ScimRails
         .quote_column_name(query.attribute)
       users.where(
         "#{column_name} #{query.operator} ?",
-        query.parameter
+        filter_attribute(query.attribute, query.parameter)
       )
     end
 
@@ -125,8 +136,9 @@ module ScimRails
       ScimRails.config
         .mutable_user_attributes
         .each.with_object({}) do |attribute, hash|
-          hash[attribute] = user_params.dig(
-            *ScimRails::ScimPathParser.path_for(attribute)
+          hash[attribute] = filter_attribute(
+            attribute,
+            user_params.dig(*ScimRails::ScimPathParser.path_for(attribute))
           )
         end
     end
