@@ -50,4 +50,6 @@ ScimRails.configure do |config|
     ],
     active: :unarchived?
   }
+
+  config.user_attribute_filters = {}
 end

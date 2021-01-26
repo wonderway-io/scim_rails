@@ -37,7 +37,8 @@ module ScimRails
       :user_attributes,
       :user_deprovision_method,
       :user_reprovision_method,
-      :user_schema
+      :user_schema,
+      :user_attribute_filters
 
     def initialize
       @basic_auth_model = 'Company'

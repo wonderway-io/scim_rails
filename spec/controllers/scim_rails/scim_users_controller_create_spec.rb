@@ -78,6 +78,29 @@ RSpec.describe ScimRails::ScimUsersController, type: :controller do
         expect(user.email).to eq 'new@example.com'
       end
 
+      it 'filters through an attribute if specified' do
+        allow(ScimRails.config).to(
+          receive(:user_attribute_filters)
+          .and_return({ email: :downcase })
+        )
+        expect(company.users.count).to eq 0
+
+        post :create, params: {
+          name: {
+            givenName: 'New',
+            familyName: 'User'
+          },
+          emails: [
+            {
+              value: 'NeW@example.com'
+            }
+          ]
+        }, as: :json
+
+        user = company.users.first
+        expect(user.email).to eq 'new@example.com'
+      end
+
       it 'ignores unconfigured params' do
         post :create, params: {
           name: {
