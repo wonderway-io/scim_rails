@@ -12,4 +12,4 @@ gemspec
 
 gem 'byebug'
 gem 'pry', group: [:development, :test]
-gem 'rails', '~> 6.0'
+gem "rails", "~> 6.1", ">= 6.0"
