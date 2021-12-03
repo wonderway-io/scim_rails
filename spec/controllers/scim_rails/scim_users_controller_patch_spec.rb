@@ -103,9 +103,9 @@ RSpec.describe ScimRails::ScimUsersController, type: :controller do
           id: 1,
           Operations: [
             {
-              'op': 'add',
-              'path': 'active',
-              'value': 'False'
+              op: 'add',
+              path: 'active',
+              value: 'False'
             }
           ]
         }, as: :json
@@ -154,9 +154,9 @@ RSpec.describe ScimRails::ScimUsersController, type: :controller do
           id: 1,
           Operations: [
             {
-              'op': 'Add',
-              'path': 'name.familyName',
-              'value': 'User Family Name'
+              op: 'Add',
+              path: 'name.familyName',
+              value: 'User Family Name'
             }
           ]
         }, as: :json
@@ -170,14 +170,14 @@ RSpec.describe ScimRails::ScimUsersController, type: :controller do
           id: 1,
           Operations: [
             {
-              'op': 'Add',
-              'path': 'name.familyName',
-              'value': 'User Family Name'
+              op: 'Add',
+              path: 'name.familyName',
+              value: 'User Family Name'
             },
             {
-              'op': 'Add',
-              'path': 'name.givenName',
-              'value': 'Otto II'
+              op: 'Add',
+              path: 'name.givenName',
+              value: 'Otto II'
             }
           ]
         }, as: :json

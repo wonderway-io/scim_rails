@@ -24,7 +24,7 @@ RSpec.describe ScimRails::ScimPathParser do
     it 'with a different schema' do
       attribute = ScimRails::ScimPathParser.attribute_for(
         'urn:ietf:params:scim:schemas:extension:enterprise:2.0:User' \
-          ':employeeNumber',
+        ':employeeNumber',
         user_schema
       )
       expect(attribute).to eq :employee_id

@@ -32,13 +32,13 @@ module ScimRails
         .offset(counts.offset)
         .limit(counts.limit)
       {
-        "schemas": [
+        schemas: [
           'urn:ietf:params:scim:api:messages:2.0:ListResponse'
         ],
-        "totalResults": counts.total,
-        "startIndex": counts.start_index,
-        "itemsPerPage": counts.limit,
-        "Resources": list_users(object)
+        totalResults: counts.total,
+        startIndex: counts.start_index,
+        itemsPerPage: counts.limit,
+        Resources: list_users(object)
       }
     end
 

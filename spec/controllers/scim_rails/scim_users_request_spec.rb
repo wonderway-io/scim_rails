@@ -24,7 +24,7 @@ RSpec.describe ScimRails::ScimUsersController, type: :request do
         ]
       }.to_json,
       headers: {
-        'Authorization': authorization,
+        Authorization: authorization,
         'Content-Type': content_type
       }
   end
