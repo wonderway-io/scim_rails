@@ -74,6 +74,8 @@ RSpec.describe ScimRails::ScimUsersController, type: :controller do
         put :put, params: put_params(active: false), as: :json
 
         expect(response.status).to eq 200
+        response_body = JSON.parse(response.body)
+        expect(response_body['active']).to eq false
         expect(user.reload.active?).to eq false
       end
 
@@ -84,6 +86,8 @@ RSpec.describe ScimRails::ScimUsersController, type: :controller do
         put :put, params: put_params(active: true), as: :json
 
         expect(response.status).to eq 200
+        response_body = JSON.parse(response.body)
+        expect(response_body['active']).to eq true
         expect(user.reload.active?).to eq true
       end
 

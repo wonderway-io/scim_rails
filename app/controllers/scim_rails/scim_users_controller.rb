@@ -1,7 +1,6 @@
 module ScimRails
   class ScimUsersController < ScimRails::ApplicationController
     before_action :load_user, except: [:index, :create]
-    after_action :update_status, except: [:index]
 
     def index
       users = company_users.order(ScimRails.config.scim_users_list_order)
@@ -43,6 +42,7 @@ module ScimRails
       ScimRails.config.on_created_user.call(@user) \
         if ScimRails.config.on_created_user.respond_to?(:call)
 
+      update_status
       json_scim_response(object: @user, status: :created)
     end
 
@@ -52,6 +52,7 @@ module ScimRails
 
     def put
       @user.update!(permitted_user_params)
+      update_status
       json_scim_response(object: @user)
     end
 
@@ -84,6 +85,7 @@ module ScimRails
         end
       end
 
+      update_status
       json_scim_response(object: @user)
     end
 

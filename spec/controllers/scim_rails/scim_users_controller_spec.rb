@@ -151,10 +151,10 @@ RSpec.describe ScimRails::ScimUsersController, type: :controller do
 
       it 'filters results by provided name filter' do
         create(:user, first_name: 'Chidi', last_name: 'Anagonye',
-                      company: company
+          company: company
         )
         create(:user, first_name: 'Eleanor', last_name: 'Shellstrop',
-                      company: company
+          company: company
         )
 
         get :index, params: {

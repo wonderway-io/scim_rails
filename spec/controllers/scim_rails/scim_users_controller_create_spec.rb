@@ -171,6 +171,8 @@ RSpec.describe ScimRails::ScimUsersController, type: :controller do
         }, as: :json
 
         expect(response.status).to eq 201
+        response_body = JSON.parse(response.body)
+        expect(response_body['active']).to eq false
         expect(company.users.count).to eq 1
         user = company.users.first
         expect(user.archived?).to eq true
