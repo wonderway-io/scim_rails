@@ -14,7 +14,7 @@ module ScimRails::ScimPathParser
 
     schema.deep_symbolize_keys
     steps.inject(schema) do |object, step|
-      next nil if object.nil?
+      next nil unless object.is_a?(Hash)
 
       _, key, filter = step.match(/^(.*?)(\[.+\])?$/).to_a
       values = object[key.to_sym]
